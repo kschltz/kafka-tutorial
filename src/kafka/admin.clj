@@ -10,15 +10,23 @@
  {:key-serde   (Serdes/Long)
   :value-serde (Serdes/String)})
 
-(defn admin-client []
- (j.admin/->AdminClient default-config))
+(defn admin-client [cfg-map]
+ (j.admin/->AdminClient cfg-map))
+
+
+(defn topic-exists? [admin-client topic-name]
+ (j.admin/topic-exists? admin-client {:topic-name topic-name}))
 
 (defn create-topic
- [admin-client & {:keys [topic-name]}]
- (j.admin/create-topics! (admin-client)
+ [admin-client {:keys [topic-name
+                       partition-count
+                       replication-factor]
+                :or {partition-count 3
+                     replication-factor 1}}]
+ (j.admin/create-topics! admin-client
                          [{:topic-name         topic-name
-                           :partition-count    3
-                           :replication-factor 1}]))
+                           :partition-count    partition-count
+                           :replication-factor replication-factor}]))
 
 (defn producer []
  (j.cli/producer default-config
@@ -38,7 +46,6 @@
     (.commitSync c)))))
 
 (comment
-
  (def pcs (->> (range 2)
                (map (fn [n]
                      (do-in-another-thread

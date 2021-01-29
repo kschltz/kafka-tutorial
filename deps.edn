@@ -1,6 +1,7 @@
 {:paths     ["src"]
 
- :deps      {org.clojure/clojure   {:mvn/version "1.10.1"}
+ :deps      {integrant/integrant   {:mvn/version "0.8.0"}
+             org.clojure/clojure   {:mvn/version "1.10.1"}
              fundingcircle/jackdaw {:mvn/version "0.7.6"}}
 
  :mvn/repos {"confluent"
