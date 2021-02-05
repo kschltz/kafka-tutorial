@@ -94,6 +94,14 @@
  (streams/for-each! stream #(prn msg %)))
 
 (defn topology []
+
+ (with-open [adm (admin-client)]
+  (when-not (topic-exists? adm "merchant-source")
+            (create-topic adm {:topic-name "merchant-source"}))
+
+  (when-not (topic-exists? adm "pos-source")
+   (create-topic adm {:topic-name "pos-source"})))
+
  (let [app-conf {"application.id"      "merch-app"
                  ;"commit.interval.ms"        100
                  "bootstrap.servers"   "localhost:9092"
