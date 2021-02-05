@@ -80,7 +80,7 @@
                                     id msg)))))))
 (defn produce-pos [n & {:keys [fixed]}]
  (with-open [prod (producer :serdes {:value-serde (serdes/edn-serde)})]
-  (->> (or  fixed (generate-pos))
+  (->> (or fixed (generate-pos))
        (take n)
        (run! (fn [{:merch/keys [id]
                    :as         msg}]
@@ -91,14 +91,14 @@
 
 
 (defn print-stream [stream msg]
- (streams/for-each! stream  #(prn msg %)))
+ (streams/for-each! stream #(prn msg %)))
 
 (defn topology []
- (let [app-conf {"application.id"            "merch-app"
-                 "commit.interval.ms"        100
-                 "bootstrap.servers"         "localhost:9092"
-                 "default.key.serde"         "org.apache.kafka.common.serialization.Serdes$LongSerde"
-                 "default.value.serde"       "jackdaw.serdes.EdnSerde"}
+ (let [app-conf {"application.id"      "merch-app"
+                 ;"commit.interval.ms"        100
+                 "bootstrap.servers"   "localhost:9092"
+                 "default.key.serde"   "org.apache.kafka.common.serialization.Serdes$LongSerde"
+                 "default.value.serde" "jackdaw.serdes.EdnSerde"}
 
        b (streams/streams-builder)
        merch-table (streams/ktable b {:topic-name "merchant-source"})
@@ -107,12 +107,12 @@
                                 (fn [merch pos] (merge merch pos)))]
 
   (-> merch-table
-       streams/to-kstream
-       (print-stream "MERCH-TABLE: "))
+      streams/to-kstream
+      (print-stream "MERCH-TABLE: "))
 
   (-> pos-table
-       streams/to-kstream
-       (print-stream "POS-TABLE: "))
+      streams/to-kstream
+      (print-stream "POS-TABLE: "))
   ;;emits only 'complete events'
   (doto full-table
    (-> streams/to-kstream
@@ -125,7 +125,7 @@
 
 
   (doto (streams/kafka-streams b app-conf)
-    streams/start)))
+   streams/start)))
 
 (defn run-example [size & {:merch/keys [id]}]
  (let [t (topology)]
